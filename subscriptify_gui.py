@@ -14,7 +14,7 @@ def get_website_text(url):
             page = context.new_page()
 
             # Go to the target URL
-            page.goto(url, timeout=60000)  # Wait for the page to load completely
+            page.goto(url, timeout=30000)  # Wait for the page to load completely
 
             # Wait for all dynamic content to load
             page.wait_for_load_state('networkidle')
