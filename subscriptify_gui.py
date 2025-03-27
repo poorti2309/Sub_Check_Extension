@@ -2,19 +2,37 @@ import requests
 from bs4 import BeautifulSoup
 import spacy
 import streamlit as st
-
+from playwright.sync_api import sync_playwright
+from bs4 import BeautifulSoup
 
 def get_website_text(url):
     try:
-        response = requests.get(url)
-        if response.status_code != 200:
-            return f"Error: Unable to fetch URL, Status Code: {response.status_code}"
-        
-        soup = BeautifulSoup(response.text, 'html.parser')
-        text = soup.get_text(separator=' ', strip=True)
-        return text
+        # Launch Playwright and open the browser
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True)  # Run in headless mode
+            context = browser.new_context()
+            page = context.new_page()
+
+            # Go to the target URL
+            page.goto(url, timeout=60000)  # Wait for the page to load completely
+
+            # Wait for all dynamic content to load
+            page.wait_for_load_state('networkidle')
+
+            # Get the fully rendered HTML content
+            content = page.content()
+
+            # Parse the content with BeautifulSoup
+            soup = BeautifulSoup(content, 'html.parser')
+            text = soup.get_text(separator=' ', strip=True)
+
+            # Close the browser
+            browser.close()
+
+            return text
     except Exception as e:
-        return f"Error: {str(e)}"
+        return f"Error: Failed to fetch the website with Playwright. {str(e)}"
+
 
 def analyze_subscription(text):
     nlp = spacy.load("en_core_web_sm")
