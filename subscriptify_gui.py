@@ -42,7 +42,7 @@ def analyze_subscription(text):
     found_keywords = {token.text for token in doc if token.text in subscription_keywords}
     
     if found_keywords:
-        if "free trial" in text.lower() or "limited access" in text.lower():
+        if "free trial" in text.lower() or "limited access" in text.lower() or "get for free" in text.lower():
             return "Freemium Model: Some content is free, but full access requires a subscription."
         return "Paid Subscription Required: This website seems to require a membership."
     
